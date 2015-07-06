@@ -1,0 +1,16 @@
+<resources>
+
+    <dimen name="padding_window">16dp</dimen>
+    <dimen name="padding_default">8dp</dimen>
+
+    <dimen name="tag_tip">22sp</dimen>
+	<dimen name="tag_h1">20sp</dimen>
+	<dimen name="tag_h2">18sp</dimen>
+	<dimen name="tag_h3">14sp</dimen>
+	<dimen name="tag_text">18sp</dimen>
+	<dimen name="tag_item">18sp</dimen>
+	<dimen name="tag_lab">18sp</dimen>
+	<dimen name="tag_parag">4dp</dimen>
+	<dimen name="tag_spliter">1.5dp</dimen>
+	
+</resources>

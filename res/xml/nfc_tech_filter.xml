@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<tech-list>
+		<tech>android.nfc.tech.IsoDep</tech>
+	</tech-list>
+	<tech-list>
+		<tech>android.nfc.tech.NfcF</tech>
+	</tech-list>
+</resources>
+
