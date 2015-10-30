@@ -1,9 +1,9 @@
-/* NFCard is free software; you can redistribute it and/or modify
+/* NFC Reader is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
-NFCard is distributed in the hope that it will be useful,
+NFC Reader is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -22,7 +22,7 @@ import android.nfc.NfcAdapter;
 import cache.wind.nfc.NfcReaderApplication;
 import cache.wind.nfc.R;
 
-import static android.provider.Settings.ACTION_WIRELESS_SETTINGS;
+import static android.provider.Settings.ACTION_SETTINGS;
 
 public final class MainPage {
 
@@ -56,9 +56,12 @@ public final class MainPage {
 		}
 
 		private void startNfcSettingsActivity() {
-			activity.startActivityForResult(new Intent(ACTION_WIRELESS_SETTINGS), 0);
+			try {
+				activity.startActivityForResult(new Intent("android.settings.NFC_SETTINGS"), 0);
+			} catch (Exception e) {
+				activity.startActivityForResult(new Intent(ACTION_SETTINGS), 0);
+			}
 		}
-
 	}
 
 	private MainPage() {

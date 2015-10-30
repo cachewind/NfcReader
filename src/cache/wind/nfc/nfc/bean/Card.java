@@ -1,9 +1,9 @@
-/* NFCard is free software; you can redistribute it and/or modify
+/* NFC Reader is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
-NFCard is distributed in the hope that it will be useful,
+NFC Reader is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -15,17 +15,18 @@ Additional permission under GNU GPL version 3 section 7 */
 
 package cache.wind.nfc.nfc.bean;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 
 import cache.wind.nfc.SPEC;
 
 public class Card extends Application {
 	public static final Card EMPTY = new Card();
 
-	private final ArrayList<Application> applications;
+	private final LinkedHashMap<Object, Application> applications;
 
 	public Card() {
-		applications = new ArrayList<>(2);
+		applications = new LinkedHashMap<Object, Application>(2);
 	}
 
 	public Exception getReadingException() {
@@ -44,13 +45,16 @@ public class Card extends Application {
 		return applications.size();
 	}
 
-	public final Application getApplication(int index) {
-		return applications.get(index);
+	public final Collection<Application> getApplications() {
+		return applications.values();
 	}
 
 	public final void addApplication(Application app) {
-		if (app != null)
-			applications.add(app);
+		if (app != null) {
+			Object id = app.getProperty(SPEC.PROP.ID);
+			if (id != null && !applications.containsKey(id))
+				applications.put(id, app);
+		}
 	}
 
 	public String toHtml() {

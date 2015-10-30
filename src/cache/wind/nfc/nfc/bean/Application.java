@@ -1,9 +1,9 @@
-/* NFCard is free software; you can redistribute it and/or modify
+/* NFC Reader is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
-NFCard is distributed in the hope that it will be useful,
+NFC Reader is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -20,7 +20,7 @@ import android.util.SparseArray;
 import cache.wind.nfc.SPEC;
 
 public class Application {
-	private final SparseArray<Object> properties = new SparseArray<>();
+	private final SparseArray<Object> properties = new SparseArray<Object>();
 
 	public final void setProperty(SPEC.PROP prop, Object value) {
 		properties.put(prop.ordinal(), value);

@@ -1,9 +1,9 @@
-/* NFCard is free software; you can redistribute it and/or modify
+/* NFC Reader is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
-NFCard is distributed in the hope that it will be useful,
+NFC Reader is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -16,12 +16,11 @@ Additional permission under GNU GPL version 3 section 7 */
 package cache.wind.nfc;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.content.ClipData;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
@@ -130,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		if (isCurrentPage(SPEC.PAGE.INFO_NORMAL, mTextArea)) {
+		if (isCurrentPage(SPEC.PAGE.INFO, mTextArea)) {
 			menu.findItem(R.id.action_copy).setVisible(true);
 			menu.findItem(R.id.action_share).setVisible(true);
 			menu.findItem(R.id.action_clear).setVisible(true);
@@ -165,8 +164,16 @@ public class MainActivity extends AppCompatActivity {
 	private void copyTextAreaContent(TextView textArea) {
 		final CharSequence text = textArea.getText();
 		if (!TextUtils.isEmpty(text)) {
-			((ClipboardManager) textArea.getContext().getSystemService(
-					Context.CLIPBOARD_SERVICE)).setText(text.toString());
+			int sdkInt = android.os.Build.VERSION.SDK_INT;
+			if (sdkInt >= android.os.Build.VERSION_CODES.HONEYCOMB){
+				android.content.ClipboardManager clipboard =  (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+				ClipData clip = ClipData.newPlainText(getString(R.string.app_name), text.toString());
+				clipboard.setPrimaryClip(clip);
+			} else{
+				//noinspection deprecation
+				android.text.ClipboardManager clipboard = (android.text.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+				clipboard.setText(text.toString());
+			}
 
 			NfcReaderApplication.showMessage(R.string.info_main_copied);
 		}
@@ -205,12 +212,12 @@ public class MainActivity extends AppCompatActivity {
 		final CharSequence info = NfcPage.getContent(this, intent);
 
 		if (NfcPage.isNormalInfo(intent)) {
-			resetTextArea(textArea, SPEC.PAGE.INFO_NORMAL, Gravity.LEFT);
+			resetTextArea(textArea, SPEC.PAGE.INFO, Gravity.LEFT);
 
 			int padding = getResources().getDimensionPixelSize(R.dimen.padding_window);
 			textArea.setPadding(padding, padding, padding, padding);
 		} else {
-			resetTextArea(textArea, SPEC.PAGE.INFO_ABNORMAL, Gravity.CENTER);
+			resetTextArea(textArea, SPEC.PAGE.ABOUT, Gravity.CENTER);
 
 			int padding = getResources().getDimensionPixelSize(R.dimen.padding_default);
 			textArea.setPadding(padding, padding, padding, padding);

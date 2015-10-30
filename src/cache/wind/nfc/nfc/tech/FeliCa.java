@@ -1,9 +1,9 @@
-/* NFCard is free software; you can redistribute it and/or modify
+/* NFC Reader is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
-NFCard is distributed in the hope that it will be useful,
+NFC Reader is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -199,7 +199,7 @@ public class FeliCa {
 		}
 
 		public boolean isNdefSupport() {
-			return (data!=null) && (data[3] & (byte) 0xff) == 1;
+			return (data == null) ? false : (data[3] & (byte) 0xff) == 1;
 		}
 
 		public void setNdefSupport(boolean ndefSupport) {
@@ -509,7 +509,7 @@ public class FeliCa {
 		}
 
 		public ServiceCode[] getServiceCodeList() throws IOException {
-			ArrayList<ServiceCode> ret = new ArrayList<>();
+			ArrayList<ServiceCode> ret = new ArrayList<ServiceCode>();
 
 			int index = 1;
 			while (true) {
@@ -554,7 +554,9 @@ public class FeliCa {
 			final byte s[] = cmd.getBytes();
 			final byte r[] = transceive(s);
 
-			return new ReadResponse(r);
+			final ReadResponse ret = new ReadResponse(r);
+
+			return ret;
 		}
 
 		public ReadResponse readWithoutEncryption(ServiceCode code, byte addr)

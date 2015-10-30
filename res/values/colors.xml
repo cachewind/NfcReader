@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- NFC Reader is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    NFC Reader is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wget.  If not, see <http://www.gnu.org/licenses/>.
+
+    Additional permission under GNU GPL version 3 section 7 -->
+
 <resources>
 	<color name="tag_tip">#FF505050</color>
+	<color name="tag_spliter">#FFC5C5C5</color>
 	<color name="tag_action">#FF888888</color>
 	<color name="tag_h1">#FF505050</color>
 	<color name="tag_h2">@color/accent_material_light</color>
 	<color name="tag_h3">#FF505050</color>
 	<color name="tag_text">#FF111111</color>
-	<color name="tag_item">#FF3F3F3F</color>
 	<color name="tag_lab">#FF3F3F3F</color>
 </resources>
 

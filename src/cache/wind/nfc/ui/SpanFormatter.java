@@ -1,9 +1,9 @@
-/* NFCard is free software; you can redistribute it and/or modify
+/* NFC Reader is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
-NFCard is distributed in the hope that it will be useful,
+NFC Reader is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -16,8 +16,12 @@ Additional permission under GNU GPL version 3 section 7 */
 package cache.wind.nfc.ui;
 
 import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetricsInt;
+import android.graphics.Paint.Style;
+import android.graphics.Path;
+import android.graphics.PathEffect;
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.Html;
@@ -127,7 +131,7 @@ public final class SpanFormatter implements Html.TagHandler {
 
 		@Override
 		public void updateMeasureState(TextPaint p) {
-			updateDrawState(p);			
+			updateDrawState(p);
 		}
 	}
 
@@ -139,8 +143,8 @@ public final class SpanFormatter implements Html.TagHandler {
 		}
 
 		@Override
-		public void chooseHeight(CharSequence text, int start, int end,
-				int spanstartv, int v, FontMetricsInt fm) {
+		public void chooseHeight(CharSequence text, int start, int end, int spanstartv, int v,
+				FontMetricsInt fm) {
 			fm.bottom += linespaceDelta;
 			fm.descent += linespaceDelta;
 		}
@@ -150,11 +154,16 @@ public final class SpanFormatter implements Html.TagHandler {
 		private final int color;
 		private final int width;
 		private final int height;
+		private final Path path;
+		private final PathEffect effe;
 
 		SplitterSpan(int color, int width, int height) {
 			this.color = color;
 			this.width = width;
 			this.height = height;
+
+			this.path = new Path();
+			this.effe = new DashPathEffect(new float[] { 6, 3, 6, 3 }, 0);
 		}
 
 		@Override
@@ -169,58 +178,62 @@ public final class SpanFormatter implements Html.TagHandler {
 		}
 
 		@Override
-		public void draw(Canvas canvas, CharSequence text, int start, int end,
-				float x, int top, int y, int bottom, Paint paint) {
+		public void draw(Canvas canvas, CharSequence text, int start, int end, float x, int top,
+				int y, int bottom, Paint paint) {
 
 			canvas.save();
 			canvas.translate(x, (bottom + top) / 2 - height);
 
 			final int c = paint.getColor();
+			final float w = paint.getStrokeWidth();
+			final Style s = paint.getStyle();
+			final PathEffect e = paint.getPathEffect();
+
 			paint.setColor(color);
-			canvas.drawRect(x, 0, x + width, height, paint);
+			paint.setStyle(Style.STROKE);
+			paint.setStrokeWidth(height);
+			paint.setPathEffect(effe);
+
+			path.moveTo(x, 0);
+			path.lineTo(x + width, 0);
+
+			canvas.drawPath(path, paint);
+
 			paint.setColor(c);
+			paint.setStyle(s);
+			paint.setStrokeWidth(w);
+			paint.setPathEffect(e);
 
 			canvas.restore();
 		}
 	}
 
 	@Override
-	public void handleTag(boolean opening, String tag, Editable output,
-			XMLReader xmlReader) {
+	public void handleTag(boolean opening, String tag, Editable output, XMLReader xmlReader) {
 
 		final int len = output.length();
 
 		if (opening) {
 
 			if (SPEC.TAG_TEXT.equals(tag)) {
-				markFontSpan(output, len, R.color.tag_text, R.dimen.tag_text,
-						Typeface.DEFAULT);
+				markFontSpan(output, len, R.color.tag_text, R.dimen.tag_text, Typeface.DEFAULT);
 			} else if (SPEC.TAG_TIP.equals(tag)) {
 				markParagSpan(output, len, R.dimen.tag_parag);
-				markFontSpan(output, len, R.color.tag_tip, R.dimen.tag_tip,
-						Typeface.DEFAULT);
+				markFontSpan(output, len, R.color.tag_tip, R.dimen.tag_tip, Typeface.DEFAULT);
 			} else if (SPEC.TAG_LAB.equals(tag)) {
-				markFontSpan(output, len, R.color.tag_lab, R.dimen.tag_lab,
-						Typeface.DEFAULT_BOLD);
-			} else if (SPEC.TAG_ITEM.equals(tag)) {
-				markFontSpan(output, len, R.color.tag_item, R.dimen.tag_item,
-						Typeface.DEFAULT);
+				markFontSpan(output, len, R.color.tag_lab, R.dimen.tag_lab, Typeface.DEFAULT_BOLD);
 			} else if (SPEC.TAG_H1.equals(tag)) {
-				markFontSpan(output, len, R.color.tag_h1, R.dimen.tag_h1,
-						Typeface.DEFAULT_BOLD);
+				markFontSpan(output, len, R.color.tag_h1, R.dimen.tag_h1, Typeface.DEFAULT_BOLD);
 			} else if (SPEC.TAG_H2.equals(tag)) {
-				markFontSpan(output, len, R.color.tag_h2, R.dimen.tag_h2,
-						Typeface.DEFAULT_BOLD);
+				markFontSpan(output, len, R.color.tag_h2, R.dimen.tag_h2, Typeface.DEFAULT_BOLD);
 			} else if (SPEC.TAG_H3.equals(tag)) {
-				markFontSpan(output, len, R.color.tag_h3, R.dimen.tag_h3,
-						Typeface.SERIF);
+				markFontSpan(output, len, R.color.tag_h3, R.dimen.tag_h3, Typeface.SERIF);
 			} else if (tag.startsWith(SPEC.TAG_ACT)) {
 				markActionSpan(output, len, tag, R.color.tag_action);
 			} else if (SPEC.TAG_PARAG.equals(tag)) {
 				markParagSpan(output, len, R.dimen.tag_parag);
 			} else if (SPEC.TAG_SP.equals(tag)) {
-				markSpliterSpan(output, len, R.color.tag_action,
-						R.dimen.tag_spliter);
+				markSpliterSpan(output, len, R.color.tag_spliter, R.dimen.tag_spliter);
 			}
 		} else {
 			if (SPEC.TAG_TEXT.equals(tag)) {
@@ -229,8 +242,6 @@ public final class SpanFormatter implements Html.TagHandler {
 				setSpan(output, len, FontSpan.class);
 				setSpan(output, len, ParagSpan.class);
 			} else if (SPEC.TAG_LAB.equals(tag)) {
-				setSpan(output, len, FontSpan.class);
-			} else if (SPEC.TAG_ITEM.equals(tag)) {
 				setSpan(output, len, FontSpan.class);
 			} else if (SPEC.TAG_H1.equals(tag)) {
 				setSpan(output, len, FontSpan.class);
@@ -246,19 +257,17 @@ public final class SpanFormatter implements Html.TagHandler {
 		}
 	}
 
-	private static void markSpliterSpan(Editable out, int pos, int colorId,
-			int heightId) {
+	private static void markSpliterSpan(Editable out, int pos, int colorId, int heightId) {
 		DisplayMetrics dm = NfcReaderApplication.getDisplayMetrics();
 		int color = NfcReaderApplication.getColorResource(colorId);
 		int height = NfcReaderApplication.getDimensionResourcePixelSize(heightId);
+		int width = dm.heightPixels > dm.widthPixels ? dm.heightPixels : dm.widthPixels;
 
-		out.append("-------------------").setSpan(
-				new SplitterSpan(color, dm.widthPixels, height), pos,
+		out.append("-------------------").setSpan(new SplitterSpan(color, width, height), pos,
 				out.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 	}
 
-	private static void markFontSpan(Editable out, int pos, int colorId,
-			int sizeId, Typeface face) {
+	private static void markFontSpan(Editable out, int pos, int colorId, int sizeId, Typeface face) {
 		int color = NfcReaderApplication.getColorResource(colorId);
 		float size = NfcReaderApplication.getDimensionResourcePixelSize(sizeId);
 		FontSpan span = new FontSpan(color, size, face);
@@ -266,22 +275,19 @@ public final class SpanFormatter implements Html.TagHandler {
 	}
 
 	private static void markParagSpan(Editable out, int pos, int linespaceId) {
-		int linespace = NfcReaderApplication
-				.getDimensionResourcePixelSize(linespaceId);
+		int linespace = NfcReaderApplication.getDimensionResourcePixelSize(linespaceId);
 		ParagSpan span = new ParagSpan(linespace);
 		out.setSpan(span, pos, pos, Spannable.SPAN_MARK_MARK);
 	}
 
 	private void markActionSpan(Editable out, int pos, String tag, int colorId) {
 		int color = NfcReaderApplication.getColorResource(colorId);
-		out.setSpan(new ActionSpan(tag, handler, color), pos, pos,
-				Spannable.SPAN_MARK_MARK);
+		out.setSpan(new ActionSpan(tag, handler, color), pos, pos, Spannable.SPAN_MARK_MARK);
 	}
 
 	private static void setSpan(Editable out, int pos, Class<?> kind) {
 		Object span = getLastMarkSpan(out, kind);
-		out.setSpan(span, out.getSpanStart(span), pos,
-				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		out.setSpan(span, out.getSpanStart(span), pos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 	}
 
 	private static Object getLastMarkSpan(Spanned text, Class<?> kind) {

@@ -1,9 +1,9 @@
-/* NFCard is free software; you can redistribute it and/or modify
+/* NFC Reader is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
-NFCard is distributed in the hope that it will be useful,
+NFC Reader is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -19,6 +19,7 @@ import android.app.Application;
 import android.util.DisplayMetrics;
 import android.widget.Toast;
 
+import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 
 public final class NfcReaderApplication extends Application implements
@@ -66,5 +67,32 @@ public final class NfcReaderApplication extends Application implements
 
 	public static DisplayMetrics getDisplayMetrics() {
 		return instance.getResources().getDisplayMetrics();
+	}
+
+	public static byte[] loadRawResource(int resId) {
+		InputStream is = null;
+		try {
+			is = instance.getResources().openRawResource(resId);
+
+			int len = is.available();
+			byte[] raw = new byte[(int) len];
+
+			int offset = 0;
+			while (offset < raw.length) {
+				int n = is.read(raw, offset, raw.length - offset);
+				if (n < 0)
+					break;
+
+				offset += n;
+			}
+			return raw;
+		} catch (Throwable e) {
+			return null;
+		} finally {
+			try {
+				is.close();
+			} catch (Throwable ee) {
+			}
+		}
 	}
 }

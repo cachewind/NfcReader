@@ -1,9 +1,9 @@
-/* NFCard is free software; you can redistribute it and/or modify
+/* NFC Reader is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
-NFCard is distributed in the hope that it will be useful,
+NFC Reader is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -66,7 +66,7 @@ public class Iso7816 {
 			return (data[0] == d0 && data[1] == d1);
 		}
 
-		return (tag >= 0 && tag <= 255) && match((byte) tag);
+		return (tag >= 0 && tag <= 255) ? match((byte) tag) : false;
 	}
 
 	public int size() {
@@ -96,7 +96,13 @@ public class Iso7816 {
 
 	@Override
 	public boolean equals(Object obj) {
-		return !(obj == null || !(obj instanceof Iso7816)) && match(((Iso7816) obj).getBytes(), 0);
+		if (this == obj)
+			return true;
+
+		if (obj == null || !(obj instanceof Iso7816))
+			return false;
+
+		return match(((Iso7816) obj).getBytes(), 0);
 	}
 
 	public final static class ID extends Iso7816 {
@@ -355,7 +361,7 @@ public class Iso7816 {
 		}
 
 		public static ArrayList<BerTLV> extractOptionList(byte[] data) {
-			final ArrayList<BerTLV> ret = new ArrayList<>();
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
 
 			int start = 0;
 			int end = data.length;
@@ -391,7 +397,7 @@ public class Iso7816 {
 	}
 
 	public final static class BerHouse {
-		final ArrayList<BerTLV> tlvs = new ArrayList<>();
+		final ArrayList<BerTLV> tlvs = new ArrayList<BerTLV>();
 
 		public int count() {
 			return tlvs.size();
@@ -451,7 +457,7 @@ public class Iso7816 {
 		}
 
 		public ArrayList<BerTLV> findAll(byte tag) {
-			final ArrayList<BerTLV> ret = new ArrayList<>();
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
 			for (BerTLV tlv : tlvs)
 				if (tlv.t.match(tag))
 					ret.add(tlv);
@@ -460,7 +466,7 @@ public class Iso7816 {
 		}
 
 		public ArrayList<BerTLV> findAll(byte... tag) {
-			final ArrayList<BerTLV> ret = new ArrayList<>();
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
 			for (BerTLV tlv : tlvs)
 				if (tlv.t.match(tag))
 					ret.add(tlv);
@@ -469,7 +475,7 @@ public class Iso7816 {
 		}
 
 		public ArrayList<BerTLV> findAll(short tag) {
-			final ArrayList<BerTLV> ret = new ArrayList<>();
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
 			for (BerTLV tlv : tlvs)
 				if (tlv.t.match(tag))
 					ret.add(tlv);
@@ -478,7 +484,7 @@ public class Iso7816 {
 		}
 
 		public ArrayList<BerTLV> findAll(BerT tag) {
-			final ArrayList<BerTLV> ret = new ArrayList<>();
+			final ArrayList<BerTLV> ret = new ArrayList<BerTLV>();
 			for (BerTLV tlv : tlvs)
 				if (tlv.t.match(tag.getBytes()))
 					ret.add(tlv);
@@ -512,10 +518,10 @@ public class Iso7816 {
 			return id;
 		}
 
-		public Response getBalance(boolean isEP) throws IOException {
+		public Response getBalance(int p1, boolean isEP) throws IOException {
 			final byte[] cmd = { (byte) 0x80, // CLA Class
 					(byte) 0x5C, // INS Instruction
-					(byte) 0x00, // P1 Parameter 1
+					(byte) p1, // P1 Parameter 1
 					(byte) (isEP ? 2 : 1), // P2 Parameter 2
 					(byte) 0x04, // Le
 			};
